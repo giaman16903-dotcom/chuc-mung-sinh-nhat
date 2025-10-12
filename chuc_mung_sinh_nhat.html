@@ -1,0 +1,92 @@
+<!--
+Lưu file này thành: Chuc_mung_sinh_nhat.html
+Cách mở: nhấp đúp file trong Windows (mở bằng trình duyệt). Nếu ảnh nền không hiển thị do hạn chế trình duyệt với đường dẫn file://, hãy sao chép ảnh vào cùng thư mục với file HTML và thay
+  background-image: url("file:///C:/Users/Admin/Pictures/anhcty.jpg");
+thành
+  background-image: url("anhcty.jpg");
+-->
+
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Chúc mừng sinh nhật!</title>
+  <style>
+    html,body{height:100%;margin:0}
+    body{
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      color:#ffffff;
+      /* đường dẫn ảnh nền -- dùng đường dẫn file tuyệt đối Windows */
+      background-image: url("anhcty.jpg");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      /* mảng lớp phủ để làm chữ dễ đọc */
+      position:relative;
+    }
+    /* lớp phủ mờ tối */
+    .overlay{
+      position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,0.35),rgba(0,0,0,0.35));
+    }
+    .card{
+      position:relative;z-index:2;
+      max-width:900px;padding:40px;border-radius:16px;
+      backdrop-filter: blur(4px);
+      box-shadow:0 10px 30px rgba(0,0,0,0.4);
+    }
+    h1{
+      margin:0;font-size:clamp(28px,6vw,72px);letter-spacing:1px;
+      text-shadow:0 4px 18px rgba(0,0,0,0.5);
+    }
+    p{
+      margin-top:12px;margin-bottom:0;font-size:clamp(14px,2.5vw,20px);opacity:0.95;
+    }
+    /* nút tải ảnh (chỉ tiện lợi) */
+    .btn{
+      display:inline-block;margin-top:20px;padding:10px 18px;border-radius:999px;text-decoration:none;font-weight:600;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.18);
+    }
+    /* hiệu ứng bong bóng nhỏ phía sau chữ */
+    .bubbles{position:absolute;inset:0;pointer-events:none;z-index:1}
+    .bubble{position:absolute;border-radius:50%;opacity:0.08;background:#fff;filter:blur(10px)}
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+  <div class="card">
+    <h1>Chúc mừng sinh nhật!</h1>
+    <p>Chúc bạn Ngân tất cả trừ vất vả 🎉</p>
+    <a class="btn" href="file:///C:/Users/Admin/Pictures/anhcty.jpg" download> Mở / Tải ảnh nền </a>
+  </div>
+
+  <!-- bong bóng trang trí (vị trí ngẫu nhiên) -->
+  <div class="bubbles" aria-hidden="true">
+    <div class="bubble" style="width:220px;height:220px;left:5%;top:10%"></div>
+    <div class="bubble" style="width:140px;height:140px;right:8%;top:20%"></div>
+    <div class="bubble" style="width:90px;height:90px;left:30%;bottom:10%"></div>
+  </div>
+
+  <script>
+    // Một chút animation cho vui
+    const bubbles = document.querySelectorAll('.bubble');
+    bubbles.forEach((b,i)=>{
+      const dur = 8 + Math.random()*6;
+      b.animate([
+        {transform: 'translateY(0) scale(1)'},
+        {transform: `translateY(${ -20 - Math.random()*40 }px) scale(${1 + Math.random()*0.15})`},
+        {transform: 'translateY(0) scale(1)'}
+      ],{duration: dur*1000, iterations: Infinity, delay: i*300});
+    });
+
+    // Nếu ảnh không load được, gợi ý thay đổi đường dẫn
+    const imgTest = new Image();
+    imgTest.src = 'file:///C:/Users/Admin/Pictures/anhcty.jpg';
+    imgTest.onload = ()=>console.log('Ảnh nền đã load thành công.');
+    imgTest.onerror = ()=>console.warn('Không thể load ảnh nền từ đường dẫn file:///C:/Users/Admin/Pictures/anhcty.jpg. Nếu trình duyệt chặn file://, hãy sao chép ảnh vào cùng thư mục với file HTML và thay đường dẫn thành "anhcty.jpg".');
+  </script>
+</body>
+</html>

@@ -54,6 +54,99 @@
     /* hiệu ứng bong bóng nhỏ phía sau chữ */
     .bubbles{position:absolute;inset:0;pointer-events:none;z-index:1}
     .bubble{position:absolute;border-radius:50%;opacity:0.08;background:#fff;filter:blur(10px)}
+
+    /* Thêm style cho trái tim với particles (hạt li ti) */
+    .heart-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .heart {
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(45deg, #ff3a7f, #ff0a6c);
+      transform: rotate(45deg);
+      position: relative;
+      box-shadow: 0 0 50px #ff006a;
+      animation: pulse 1.5s ease infinite;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      z-index: 3;
+    }
+    .heart:hover {
+      transform: rotate(45deg) scale(1.2);
+      box-shadow: 0 0 70px #ff006a;
+    }
+    .heart:before,
+    .heart:after {
+      content: "";
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(45deg, #ff3a7f, #ff0a6c);
+      border-radius: 50%;
+      position: absolute;
+    }
+    .heart:before {
+      top: -50px;
+      left: 0;
+    }
+    .heart:after {
+      top: 0;
+      left: -50px;
+    }
+    @keyframes pulse {
+      0% {
+        transform: rotate(45deg) scale(1);
+        box-shadow: 0 0 50px #ff006a;
+      }
+      50% {
+        transform: rotate(45deg) scale(1.1);
+        box-shadow: 0 0 70px #ff006a;
+      }
+      100% {
+        transform: rotate(45deg) scale(1);
+        box-shadow: 0 0 50px #ff006a;
+      }
+    }
+    .particle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: float 1.5s ease-out forwards;
+      opacity: 0.8;
+      z-index: 2;
+    }
+    @keyframes float {
+      0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        opacity: 0.8;
+      }
+      100% {
+        transform: translate(
+          calc(var(--random-x) * 150px - 75px),
+          calc(var(--random-y) * 150px - 75px)
+        )
+        rotate(360deg) scale(0);
+        opacity: 0;
+      }
+    }
+    .heart::before,
+    .heart::after {
+      animation: glow 3s linear infinite;
+    }
+    @keyframes glow {
+      0% {
+        filter: drop-shadow(0 0 5px rgba(255, 58, 127, 0.6));
+      }
+      50% {
+        filter: drop-shadow(0 0 20px rgba(255, 58, 127, 0.8));
+      }
+      100% {
+        filter: drop-shadow(0 0 5px rgba(255, 58, 127, 0.6));
+      }
+    }
   </style>
 </head>
 <body>
@@ -71,7 +164,11 @@
       </iframe>
     </div>
     
-    <a class="btn" href="anhcty.jpg" download> Mở / Tải ảnh nền </a>  <!-- Thay href thành đường dẫn tương đối -->
+    <!-- Thêm trái tim với particles ở đây -->
+    <div class="heart-container">
+      <div class="heart"></div>
+    </div>
+    
   </div>
 
   <!-- bong bóng trang trí (vị trí ngẫu nhiên) -->
@@ -82,7 +179,7 @@
   </div>
 
   <script>
-    // Một chút animation cho vui
+    // Một chút animation cho vui (bong bóng)
     const bubbles = document.querySelectorAll('.bubble');
     bubbles.forEach((b,i)=>{
       const dur = 8 + Math.random()*6;
@@ -98,6 +195,30 @@
     imgTest.src = 'anhcty.jpg';  // Thay bằng đường dẫn tương đối
     imgTest.onload = ()=>console.log('Ảnh nền đã load thành công.');
     imgTest.onerror = ()=>console.warn('Không thể load ảnh nền từ "anhcty.jpg". Hãy kiểm tra đường dẫn file trong repo GitHub.');
+
+    // Script cho particles trái tim (tạo hạt khi hover)
+    document.querySelector(".heart").addEventListener("mousemove", (e) => {
+      const particles = document.createElement("div");
+      particles.className = "particle";
+      particles.style.left = e.clientX + "px";
+      particles.style.top = e.clientY + "px";
+
+      const colors = ["#ff3a7f", "#ff0a6c", "#ff6b9e", "#ff9ec4"];
+      particles.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+      const size = Math.random() * 15 + 5;
+      particles.style.width = size + "px";
+      particles.style.height = size + "px";
+
+      particles.style.setProperty("--random-x", Math.random() * 2 - 1);
+      particles.style.setProperty("--random-y", Math.random() * 2 - 1);
+
+      document.body.appendChild(particles);
+
+      setTimeout(() => {
+        particles.remove();
+      }, 1500);
+    });
   </script>
 </body>
 </html>

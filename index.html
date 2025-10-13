@@ -61,7 +61,7 @@
       border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-      background: rgba(0,0,0,0.3);
+      background: rgba(0,0,0,0.5);  /* Tăng độ tối nền để tim nổi bật hơn */
       z-index: 3;
     }
     .heart-lytuan-canvas {
@@ -119,14 +119,14 @@
     imgTest.onload = ()=>console.log('Ảnh nền đã load thành công.');
     imgTest.onerror = ()=>console.warn('Không thể load ảnh nền từ "anhcty.jpg". Hãy kiểm tra đường dẫn file trong repo GitHub.');
 
-    // Định nghĩa settings (tối ưu để thấy tim đầy đủ ở giữa)
+    // Định nghĩa settings (dựa trên code chuẩn, điều chỉnh cho container)
     var settings = {
       particles: {
-        length:   3000, // Tăng particles rất nhiều để dày đặc
-        duration:   12, // Tăng thời gian sống rất lâu để thấy hình rõ ràng
-        velocity: 15, // Giảm velocity thấp để particles bay rất chậm, ở gần tim lâu
-        effect: -0.8, // Điều chỉnh effect cho quỹ đạo cong tự nhiên
-        size:      16, // Kích thước hạt vừa phải
+        length:   2000, // Số lượng particles pool
+        duration:   5, // Thời gian sống của particle (giây)
+        velocity: 60, // Tốc độ bay (pixels/sec)
+        effect: -0.75, // Hiệu ứng cong
+        size:      20, // Kích thước hạt
       },
     };
 
@@ -199,15 +199,12 @@
           duration    = settings.particles.duration;
    
       function ParticlePool(length) {
-        // create and populate particle pool
         particles = new Array(length);
         for (var i = 0; i < particles.length; i++)
           particles[i] = new Particle();
       }
       ParticlePool.prototype.add = function(x, y, dx, dy) {
         particles[firstFree].initialize(x, y, dx, dy);
-       
-        // handle circular queue
         firstFree++;
         if (firstFree   == particles.length) firstFree   = 0;
         if (firstActive == firstFree       ) firstActive++;
@@ -215,8 +212,6 @@
       };
       ParticlePool.prototype.update = function(deltaTime) {
         var i;
-       
-        // update active particles
         if (firstActive < firstFree) {
           for (i = firstActive; i < firstFree; i++)
             particles[i].update(deltaTime);
@@ -227,17 +222,13 @@
           for (i = 0; i < firstFree; i++)
             particles[i].update(deltaTime);
         }
-       
-        // remove inactive particles
         while (particles[firstActive].age >= duration && firstActive != firstFree) {
           firstActive++;
           if (firstActive == particles.length) firstActive = 0;
         }
       };
       ParticlePool.prototype.draw = function(context, image) {
-        var i;  // Đảm bảo i được khai báo
-   
-        // draw active particles
+        var i;
         if (firstActive < firstFree) {
           for (i = firstActive; i < firstFree; i++)
             particles[i].draw(context, image);
@@ -252,98 +243,87 @@
       return ParticlePool;
     })();
 
-    // Bây giờ gọi function render trái tim
+    // Render trái tim (dựa trên code chuẩn, điều chỉnh cho container)
     (function(canvas) {
       var context = canvas.getContext('2d'),
           particles = new ParticlePool(settings.particles.length),
           particleRate = settings.particles.length / settings.particles.duration,
           time,
           imageLoaded = false;
-   
-      // get point on heart with -PI <= t <= PI
+      var scale = 1.8;  // Scale để tim vừa khít 600px
+
       function pointOnHeart(t) {
         return new Point(
           160 * Math.pow(Math.sin(t), 3),
           130 * Math.cos(t) - 50 * Math.cos(2 * t) - 20 * Math.cos(3 * t) - 10 * Math.cos(4 * t) + 25
         );
       }
-   
-      // creating the particle image using a dummy canvas
+
       var image = (function() {
-        var canvas  = document.createElement('canvas'),
-            context = canvas.getContext('2d');
-        canvas.width  = settings.particles.size;
-        canvas.height = settings.particles.size;
-        // helper function to create the path
+        var dummyCanvas = document.createElement('canvas'),
+            dummyContext = dummyCanvas.getContext('2d');
+        dummyCanvas.width = settings.particles.size;
+        dummyCanvas.height = settings.particles.size;
         function to(t) {
           var point = pointOnHeart(t);
-          point.x = settings.particles.size / 2 + point.x * settings.particles.size / 400;  // Giảm scale để tim nhỏ hơn trong hạt
-          point.y = settings.particles.size / 2 - point.y * settings.particles.size / 400;
+          point.x = settings.particles.size / 2 + point.x * settings.particles.size / 350;
+          point.y = settings.particles.size / 2 - point.y * settings.particles.size / 350;
           return point;
         }
-        // create the path
-        context.beginPath();
+        dummyContext.beginPath();
         var t = -Math.PI;
         var point = to(t);
-        context.moveTo(point.x, point.y);
+        dummyContext.moveTo(point.x, point.y);
         while (t < Math.PI) {
           t += 0.01;
           point = to(t);
-          context.lineTo(point.x, point.y);
+          dummyContext.lineTo(point.x, point.y);
         }
-        context.closePath();
-        // create the fill
-        context.fillStyle = '#FF5CA4';  // Màu hồng đậm hơn
-        context.fill();
-        // create the image
+        dummyContext.closePath();
+        dummyContext.fillStyle = '#ea80b0';
+        dummyContext.fill();
         var image = new Image();
-        image.src = canvas.toDataURL();
+        image.src = dummyCanvas.toDataURL();
         return image;
       })();
-   
-      // Chờ image load
+
       image.onload = function() {
         imageLoaded = true;
         console.log('Image loaded, starting render!');
       };
-   
-      // render that thing!
+
       function render() {
         requestAnimationFrame(render);
-       
-        var newTime   = new Date().getTime() / 1000,
+        var newTime = new Date().getTime() / 1000,
             deltaTime = newTime - (time || newTime);
         time = newTime;
-       
-        // clear canvas
         context.clearRect(0, 0, canvas.width, canvas.height);
-       
+        context.globalCompositeOperation = 'lighter';  // Làm particles sáng hơn khi chồng
         if (imageLoaded) {
-          // create new particles
-          var amount = particleRate * deltaTime * 2;  // Tăng rate gấp đôi để dày đặc hơn
+          var amount = particleRate * deltaTime * 3;  // Tăng rate để dày đặc
           for (var i = 0; i < amount; i++) {
             var pos = pointOnHeart(Math.PI - 2 * Math.PI * Math.random());
-            // Scale pos để tim vừa khít ở giữa canvas (dựa trên bounds -160..160 x, -145..145 y)
-            pos.x *= 1.5;  // Scale vừa với 600px (300 radius)
-            pos.y *= 1.5;
+            var pos_x = canvas.width / 2 + pos.x * scale;
+            var pos_y = canvas.height / 2 - pos.y * scale;
             var dir = pos.clone().length(settings.particles.velocity);
-            particles.add(canvas.width / 2 + pos.x, canvas.height / 2 + pos.y, dir.x, dir.y);  // Sửa -pos.y thành +pos.y để flip đúng
+            dir.x *= scale;
+            dir.y *= scale;
+            var dir_x = dir.x;
+            var dir_y = -dir.y;  // Flip y cho direction
+            particles.add(pos_x, pos_y, dir_x, dir_y);
           }
-         
-          // update and draw particles
           particles.update(deltaTime);
           particles.draw(context, image);
         }
+        context.globalCompositeOperation = 'source-over';  // Reset
       }
-   
-      // handle (re-)sizing of the canvas
+
       function onResize() {
-        canvas.width  = canvas.clientWidth;
+        canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
       }
       window.onresize = onResize;
-   
-      // delay rendering bootstrap
+
       setTimeout(function() {
         onResize();
         render();

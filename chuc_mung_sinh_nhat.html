@@ -61,7 +61,7 @@
       border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-      background: rgba(0,0,0,0.5);  /* Tăng độ tối nền để tim nổi bật hơn */
+      background: rgba(0,0,0,0.6);  /* Tăng độ tối để tim nổi bật */
       z-index: 3;
     }
     .heart-lytuan-canvas {
@@ -119,14 +119,14 @@
     imgTest.onload = ()=>console.log('Ảnh nền đã load thành công.');
     imgTest.onerror = ()=>console.warn('Không thể load ảnh nền từ "anhcty.jpg". Hãy kiểm tra đường dẫn file trong repo GitHub.');
 
-    // Định nghĩa settings (dựa trên code chuẩn, điều chỉnh cho container)
+    // Định nghĩa settings (tối ưu để thấy tim đầy đủ ở giữa)
     var settings = {
       particles: {
-        length:   2000, // Số lượng particles pool
-        duration:   5, // Thời gian sống của particle (giây)
-        velocity: 60, // Tốc độ bay (pixels/sec)
+        length:   4000, // Tăng particles để dày đặc
+        duration:   10, // Thời gian sống lâu hơn
+        velocity: 40, // Tốc độ vừa phải
         effect: -0.75, // Hiệu ứng cong
-        size:      20, // Kích thước hạt
+        size:      18, // Kích thước hạt
       },
     };
 
@@ -206,7 +206,7 @@
       ParticlePool.prototype.add = function(x, y, dx, dy) {
         particles[firstFree].initialize(x, y, dx, dy);
         firstFree++;
-        if (firstFree   == particles.length) firstFree   = 0;
+        if (firstFree   == particles.length)firstFree   = 0;
         if (firstActive == firstFree       ) firstActive++;
         if (firstActive == particles.length) firstActive = 0;
       };
@@ -243,14 +243,14 @@
       return ParticlePool;
     })();
 
-    // Render trái tim (dựa trên code chuẩn, điều chỉnh cho container)
+    // Render trái tim
     (function(canvas) {
       var context = canvas.getContext('2d'),
           particles = new ParticlePool(settings.particles.length),
           particleRate = settings.particles.length / settings.particles.duration,
           time,
           imageLoaded = false;
-      var scale = 1.8;  // Scale để tim vừa khít 600px
+      var scale = 1.0;  // Giảm scale để tim nhỏ hơn và fit toàn bộ ở giữa
 
       function pointOnHeart(t) {
         return new Point(
@@ -298,24 +298,22 @@
             deltaTime = newTime - (time || newTime);
         time = newTime;
         context.clearRect(0, 0, canvas.width, canvas.height);
-        context.globalCompositeOperation = 'lighter';  // Làm particles sáng hơn khi chồng
+        context.globalCompositeOperation = 'lighter';
         if (imageLoaded) {
-          var amount = particleRate * deltaTime * 3;  // Tăng rate để dày đặc
+          var amount = particleRate * deltaTime * 6;  // Tăng rate để dày đặc hơn
           for (var i = 0; i < amount; i++) {
             var pos = pointOnHeart(Math.PI - 2 * Math.PI * Math.random());
             var pos_x = canvas.width / 2 + pos.x * scale;
             var pos_y = canvas.height / 2 - pos.y * scale;
             var dir = pos.clone().length(settings.particles.velocity);
-            dir.x *= scale;
-            dir.y *= scale;
             var dir_x = dir.x;
-            var dir_y = -dir.y;  // Flip y cho direction
+            var dir_y = -dir.y;
             particles.add(pos_x, pos_y, dir_x, dir_y);
           }
           particles.update(deltaTime);
           particles.draw(context, image);
         }
-        context.globalCompositeOperation = 'source-over';  // Reset
+        context.globalCompositeOperation = 'source-over';
       }
 
       function onResize() {

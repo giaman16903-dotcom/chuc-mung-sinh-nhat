@@ -119,14 +119,14 @@
     imgTest.onload = ()=>console.log('Ảnh nền đã load thành công.');
     imgTest.onerror = ()=>console.warn('Không thể load ảnh nền từ "anhcty.jpg". Hãy kiểm tra đường dẫn file trong repo GitHub.');
 
-    // Định nghĩa settings (tối ưu để thấy tim đầy đủ ở giữa, nhỏ hơn)
+    // Định nghĩa settings (tối ưu để thấy tim đầy đủ ở giữa)
     var settings = {
       particles: {
-        length:   5000, // Tăng particles để dày đặc
-        duration:   15, // Thời gian sống lâu hơn để hình đầy
-        velocity: 25, // Tốc độ chậm hơn để hạt ở lại lâu
-        effect: -0.75, // Hiệu ứng cong
-        size:      12, // Giảm kích thước hạt để chi tiết hơn
+        length:   8000, // Tăng particles rất nhiều để đầy đặc hình tim
+        duration:   25, // Thời gian sống rất lâu để hạt ở lại lâu, hiện đầy hình
+        velocity: 15, // Tốc độ rất chậm để hạt bay chậm, hình tim rõ nét
+        effect: -0.6, // Hiệu ứng cong nhẹ để hạt lan tỏa tự nhiên
+        size:      8, // Kích thước hạt nhỏ để chi tiết hơn
       },
     };
 
@@ -250,7 +250,7 @@
           particleRate = settings.particles.length / settings.particles.duration,
           time,
           imageLoaded = false;
-      var scale = 0.8;  // Giảm scale để tim nhỏ hơn, hiển thị toàn bộ
+      var scale = 1.2;  // Scale vừa phải để tim đầy đủ ở giữa
 
       function pointOnHeart(t) {
         return new Point(
@@ -300,7 +300,7 @@
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.globalCompositeOperation = 'lighter';
         if (imageLoaded) {
-          var amount = particleRate * deltaTime * 8;  // Tăng rate để dày đặc hơn
+          var amount = particleRate * deltaTime * 12;  // Tăng rate rất cao để đầy đặc hình tim
           for (var i = 0; i < amount; i++) {
             var pos = pointOnHeart(Math.PI - 2 * Math.PI * Math.random());
             var pos_x = canvas.width / 2 + pos.x * scale;

@@ -1,5 +1,7 @@
 <!doctype html>
 <html lang="vi">
+<head><!doctype html>
+<html lang="vi">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -119,95 +121,7 @@
     imgTest.onload = ()=>console.log('Ảnh nền đã load thành công.');
     imgTest.onerror = ()=>console.warn('Không thể load ảnh nền từ "anhcty.jpg". Hãy kiểm tra đường dẫn file trong repo GitHub.');
 
-    // Code trái tim Lý Tuân (tích hợp vào canvas nhỏ)
-    (function(canvas) {
-      var context = canvas.getContext('2d'),
-          particles = new ParticlePool(settings.particles.length),
-          particleRate = settings.particles.length / settings.particles.duration, // particles/sec
-          time;
-   
-      // get point on heart with -PI <= t <= PI
-      function pointOnHeart(t) {
-        return new Point(
-          160 * Math.pow(Math.sin(t), 3),
-          130 * Math.cos(t) - 50 * Math.cos(2 * t) - 20 * Math.cos(3 * t) - 10 * Math.cos(4 * t) + 25
-        );
-      }
-   
-      // creating the particle image using a dummy canvas
-      var image = (function() {
-        var canvas  = document.createElement('canvas'),
-            context = canvas.getContext('2d');
-        canvas.width  = settings.particles.size;
-        canvas.height = settings.particles.size;
-        // helper function to create the path
-        function to(t) {
-          var point = pointOnHeart(t);
-          point.x = settings.particles.size / 2 + point.x * settings.particles.size / 350;
-          point.y = settings.particles.size / 2 - point.y * settings.particles.size / 350;
-          return point;
-        }
-        // create the path
-        context.beginPath();
-        var t = -Math.PI;
-        var point = to(t);
-        context.moveTo(point.x, point.y);
-        while (t < Math.PI) {
-          t += 0.01; // baby steps!
-          point = to(t);
-          context.lineTo(point.x, point.y);
-        }
-        context.closePath();
-        // create the fill
-        context.fillStyle = '#ea80b0';
-        context.fill();
-        // create the image
-        var image = new Image();
-        image.src = canvas.toDataURL();
-        return image;
-      })();
-   
-      // render that thing!
-      function render() {
-        // next animation frame
-        requestAnimationFrame(render);
-       
-        // update time
-        var newTime   = new Date().getTime() / 1000,
-            deltaTime = newTime - (time || newTime);
-        time = newTime;
-       
-        // clear canvas
-        context.clearRect(0, 0, canvas.width, canvas.height);
-       
-        // create new particles
-        var amount = particleRate * deltaTime;
-        for (var i = 0; i < amount; i++) {
-          var pos = pointOnHeart(Math.PI - 2 * Math.PI * Math.random());
-          var dir = pos.clone().length(settings.particles.velocity);
-          particles.add(canvas.width / 2 + pos.x, canvas.height / 2 - pos.y, dir.x, -dir.y);
-        }
-       
-        // update and draw particles
-        particles.update(deltaTime);
-        particles.draw(context, image);
-      }
-   
-      // handle (re-)sizing of the canvas
-      function onResize() {
-        canvas.width  = canvas.clientWidth;
-        canvas.height = canvas.clientHeight;
-      }
-      window.onresize = onResize;
-   
-      // delay rendering bootstrap
-      setTimeout(function() {
-        onResize();
-        render();
-      }, 10);
-    })(document.getElementById('pinkboard'));
-
-    // Định nghĩa các class cần thiết cho trái tim (Point, Particle, ParticlePool)
+    // Định nghĩa settings, Point, Particle, ParticlePool TRƯỚC khi gọi function (sửa lỗi)
     var settings = {
       particles: {
         length:   200, // Giảm số lượng để fit canvas nhỏ
@@ -217,6 +131,9 @@
         size:      16, // Giảm size để hạt nhỏ hơn
       },
     };
+
+    // RequestAnimationFrame polyfill
+    (function(){var b=0;var c=["ms","moz","webkit","o"];for(var a=0;a<c.length&&!window.requestAnimationFrame;++a){window.requestAnimationFrame=window[c[a]+"RequestAnimationFrame"];window.cancelAnimationFrame=window[c[a]+"CancelAnimationFrame"]||window[c[a]+"CancelRequestAnimationFrame"]}if(!window.requestAnimationFrame){window.requestAnimationFrame=function(h,e){var d=new Date().getTime();var f=Math.max(0,16-(d-b));var g=window.setTimeout(function(){h(d+f)},f);b=d+f;return g}}if(!window.cancelAnimationFrame){window.cancelAnimationFrame=function(d){clearTimeout(d)}}}());
 
     var Point = (function() {
       function Point(x, y) {
@@ -334,6 +251,225 @@
       };
       return ParticlePool;
     })();
+
+    // Bây giờ gọi function render trái tim (sau khi định nghĩa đầy đủ)
+    (function(canvas) {
+      var context = canvas.getContext('2d'),
+          particles = new ParticlePool(settings.particles.length),
+          particleRate = settings.particles.length / settings.particles.duration, // particles/sec
+          time;
+   
+      // get point on heart with -PI <= t <= PI
+      function pointOnHeart(t) {
+        return new Point(
+          160 * Math.pow(Math.sin(t), 3),
+          130 * Math.cos(t) - 50 * Math.cos(2 * t) - 20 * Math.cos(3 * t) - 10 * Math.cos(4 * t) + 25
+        );
+      }
+   
+      // creating the particle image using a dummy canvas
+      var image = (function() {
+        var canvas  = document.createElement('canvas'),
+            context = canvas.getContext('2d');
+        canvas.width  = settings.particles.size;
+        canvas.height = settings.particles.size;
+        // helper function to create the path
+        function to(t) {
+          var point = pointOnHeart(t);
+          point.x = settings.particles.size / 2 + point.x * settings.particles.size / 350;
+          point.y = settings.particles.size / 2 - point.y * settings.particles.size / 350;
+          return point;
+        }
+        // create the path
+        context.beginPath();
+        var t = -Math.PI;
+        var point = to(t);
+        context.moveTo(point.x, point.y);
+        while (t < Math.PI) {
+          t += 0.01; // baby steps!
+          point = to(t);
+          context.lineTo(point.x, point.y);
+        }
+        context.closePath();
+        // create the fill
+        context.fillStyle = '#ea80b0';
+        context.fill();
+        // create the image
+        var image = new Image();
+        image.src = canvas.toDataURL();
+        return image;
+      })();
+   
+      // render that thing!
+      function render() {
+        // next animation frame
+        requestAnimationFrame(render);
+       
+        // update time
+        var newTime   = new Date().getTime() / 1000,
+            deltaTime = newTime - (time || newTime);
+        time = newTime;
+       
+        // clear canvas
+        context.clearRect(0, 0, canvas.width, canvas.height);
+       
+        // create new particles
+        var amount = particleRate * deltaTime;
+        for (var i = 0; i < amount; i++) {
+          var pos = pointOnHeart(Math.PI - 2 * Math.PI * Math.random());
+          var dir = pos.clone().length(settings.particles.velocity);
+          particles.add(canvas.width / 2 + pos.x, canvas.height / 2 - pos.y, dir.x, -dir.y);
+        }
+       
+        // update and draw particles
+        particles.update(deltaTime);
+        particles.draw(context, image);
+      }
+   
+      // handle (re-)sizing of the canvas
+      function onResize() {
+        canvas.width  = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+      }
+      window.onresize = onResize;
+   
+      // delay rendering bootstrap
+      setTimeout(function() {
+        onResize();
+        render();
+      }, 10);
+    })(document.getElementById('pinkboard'));
   </script>
 </body>
 </html>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Chúc mừng sinh nhật!</title>
+  <style>
+    html,body{height:100%;margin:0}
+    body{
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      color:#ffffff;
+      /* đường dẫn ảnh nền -- dùng đường dẫn file tương đối cho GitHub Pages */
+      background-image: url("anhcty.jpg");  /* Thay bằng đường dẫn tương đối nếu deploy */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      /* mảng lớp phủ để làm chữ dễ đọc */
+      position:relative;
+    }
+    /* lớp phủ mờ tối */
+    .overlay{
+      position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,0.35),rgba(0,0,0,0.35));
+    }
+    .card{
+      position:relative;z-index:2;
+      max-width:900px;padding:40px;border-radius:16px;
+      backdrop-filter: blur(4px);
+      box-shadow:0 10px 30px rgba(0,0,0,0.4);
+      /* Thêm để video fit tốt hơn */
+      width: 90%; max-width: 800px;
+    }
+    h1{
+      margin:0;font-size:clamp(28px,6vw,72px);letter-spacing:1px;
+      text-shadow:0 4px 18px rgba(0,0,0,0.5);
+    }
+    p{
+      margin-top:12px;margin-bottom:0;font-size:clamp(14px,2.5vw,20px);opacity:0.95;
+    }
+    /* Thêm style cho video embed */
+    .video-container {
+      margin-top: 20px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    /* hiệu ứng bong bóng nhỏ phía sau chữ */
+    .bubbles{position:absolute;inset:0;pointer-events:none;z-index:1}
+    .bubble{position:absolute;border-radius:50%;opacity:0.08;background:#fff;filter:blur(10px)}
+
+    /* Style cho container trái tim Lý Tuân */
+    .heart-lytuan-container {
+      position: relative;
+      display: inline-block;
+      width: 400px;  /* Kích thước canvas nhỏ hơn để fit */
+      height: 400px;
+      margin-top: 20px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      background: rgba(0,0,0,0.2);  /* Nền mờ để blend với ảnh nền */
+      z-index: 3;
+    }
+    .heart-lytuan-canvas {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+  <div class="card">
+    <h1>Chúc mừng sinh nhật!</h1>
+    <p>Chúc bạn Ngân tất cả trừ vất vả 🎉</p>
+    
+    <!-- Thêm video YouTube embed ở đây -->
+    <div class="video-container">
+      <iframe width="100%" height="315" src="https://www.youtube.com/embed/Lc94a3CZeG8" 
+              title="Video chúc mừng sinh nhật" frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+              allowfullscreen>
+      </iframe>
+    </div>
+    
+    <!-- Container cho trái tim Lý Tuân -->
+    <div class="heart-lytuan-container">
+      <canvas id="pinkboard" class="heart-lytuan-canvas"></canvas>
+    </div>
+    
+  </div>
+
+  <!-- bong bóng trang trí (vị trí ngẫu nhiên) -->
+  <div class="bubbles" aria-hidden="true">
+    <div class="bubble" style="width:220px;height:220px;left:5%;top:10%"></div>
+    <div class="bubble" style="width:140px;height:140px;right:8%;top:20%"></div>
+    <div class="bubble" style="width:90px;height:90px;left:30%;bottom:10%"></div>
+  </div>
+
+  <script>
+    // Một chút animation cho vui (bong bóng)
+    const bubbles = document.querySelectorAll('.bubble');
+    bubbles.forEach((b,i)=>{
+      const dur = 8 + Math.random()*6;
+      b.animate([
+        {transform: 'translateY(0) scale(1)'},
+        {transform: `translateY(${ -20 - Math.random()*40 }px) scale(${1 + Math.random()*0.15})`},
+        {transform: 'translateY(0) scale(1)'}
+      ],{duration: dur*1000, iterations: Infinity, delay: i*300});
+    });
+
+    // Nếu ảnh không load được, gợi ý thay đổi đường dẫn
+    const imgTest = new Image();
+    imgTest.src = 'anhcty.jpg';  // Thay bằng đường dẫn tương đối
+    imgTest.onload = ()=>console.log('Ảnh nền đã load thành công.');
+    imgTest.onerror = ()=>console.warn('Không thể load ảnh nền từ "anhcty.jpg". Hãy kiểm tra đường dẫn file trong repo GitHub.');
+
+    // Định nghĩa settings, Point, Particle, ParticlePool TRƯỚC khi gọi function (sửa lỗi)
+    var settings = {
+      particles: {
+        length:   200, // Giảm số lượng để fit canvas nhỏ
+        duration:   2, // particle duration in sec
+        velocity: 50, // Giảm velocity để fit
+        effect: -0.75, // play with this for a nice effect
+        size:      16, // Giảm size để hạt nhỏ hơn
+      },
+    };
+
+    // RequestAnimationFrame polyfill
+    (function(){var b=0;var c=["ms","moz","webkit","o"];for(var a=0;a<c.length&&!window.requestAnimationFrame;++a){window.requestAnimationFrame=window[c[a]+"RequestAnimationFrame"];window.cancelAnimationFrame=window[c[a]+"CancelAnimationFrame"]||window[c[a]+"CancelRequestAnimationFrame"]}if(!window.requestAnimationFrame){window.requestAnimationFrame=function(h,e){var d=new Date().getTime();var f=Math.max(0,16-(d-b));var g=window.setTimeout(function(){h(d+f)},f);b=d+f;return g}}if(!window.cancelAnimationFrame){window.cancelAnimationFrame=function(d){clearTimeout(d

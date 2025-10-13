@@ -47,67 +47,40 @@
       overflow: hidden;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
-    /* nút tải ảnh (chỉ tiện lợi) */
-    .btn{
-      display:inline-block;margin-top:20px;padding:10px 18px;border-radius:999px;text-decoration:none;font-weight:600;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.18);
-    }
     /* hiệu ứng bong bóng nhỏ phía sau chữ */
     .bubbles{position:absolute;inset:0;pointer-events:none;z-index:1}
     .bubble{position:absolute;border-radius:50%;opacity:0.08;background:#fff;filter:blur(10px)}
 
-    /* Thêm style cho trái tim với particles (hạt li ti) */
+    /* Style cho container trái tim (từ particles) */
     .heart-container {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
-    }
-    .heart {
-      width: 100px;
-      height: 100px;
-      background: linear-gradient(45deg, #ff3a7f, #ff0a6c);
-      transform: rotate(45deg);
       position: relative;
-      box-shadow: 0 0 50px #ff006a;
-      animation: pulse 1.5s ease infinite;
-      transition: all 0.3s ease;
+      display: inline-block;
+      width: 100px;
+      height: 90px;
+      margin-top: 20px;
       cursor: pointer;
       z-index: 3;
     }
-    .heart:hover {
-      transform: rotate(45deg) scale(1.2);
-      box-shadow: 0 0 70px #ff006a;
-    }
-    .heart:before,
-    .heart:after {
-      content: "";
-      width: 100px;
-      height: 100px;
+    /* Hạt nhỏ ghép thành trái tim */
+    .heart-particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
       background: linear-gradient(45deg, #ff3a7f, #ff0a6c);
       border-radius: 50%;
-      position: absolute;
+      box-shadow: 0 0 4px #ff006a;
+      animation: heartPulse 2s ease-in-out infinite;
+      transition: all 0.3s ease;
     }
-    .heart:before {
-      top: -50px;
-      left: 0;
+    @keyframes heartPulse {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 1; }
     }
-    .heart:after {
-      top: 0;
-      left: -50px;
+    .heart-container:hover .heart-particle {
+      transform: scale(1.5);
+      box-shadow: 0 0 8px #ff006a;
     }
-    @keyframes pulse {
-      0% {
-        transform: rotate(45deg) scale(1);
-        box-shadow: 0 0 50px #ff006a;
-      }
-      50% {
-        transform: rotate(45deg) scale(1.1);
-        box-shadow: 0 0 70px #ff006a;
-      }
-      100% {
-        transform: rotate(45deg) scale(1);
-        box-shadow: 0 0 50px #ff006a;
-      }
-    }
+    /* Particles bay ra (giữ nguyên) */
     .particle {
       position: absolute;
       width: 10px;
@@ -132,21 +105,6 @@
         opacity: 0;
       }
     }
-    .heart::before,
-    .heart::after {
-      animation: glow 3s linear infinite;
-    }
-    @keyframes glow {
-      0% {
-        filter: drop-shadow(0 0 5px rgba(255, 58, 127, 0.6));
-      }
-      50% {
-        filter: drop-shadow(0 0 20px rgba(255, 58, 127, 0.8));
-      }
-      100% {
-        filter: drop-shadow(0 0 5px rgba(255, 58, 127, 0.6));
-      }
-    }
   </style>
 </head>
 <body>
@@ -164,10 +122,8 @@
       </iframe>
     </div>
     
-    <!-- Thêm trái tim với particles ở đây -->
-    <div class="heart-container">
-      <div class="heart"></div>
-    </div>
+    <!-- Container cho trái tim từ particles -->
+    <div class="heart-container" id="heartContainer"></div>
     
   </div>
 
@@ -196,27 +152,52 @@
     imgTest.onload = ()=>console.log('Ảnh nền đã load thành công.');
     imgTest.onerror = ()=>console.warn('Không thể load ảnh nền từ "anhcty.jpg". Hãy kiểm tra đường dẫn file trong repo GitHub.');
 
-    // Script cho particles trái tim (tạo hạt khi hover)
-    document.querySelector(".heart").addEventListener("mousemove", (e) => {
-      const particles = document.createElement("div");
-      particles.className = "particle";
-      particles.style.left = e.clientX + "px";
-      particles.style.top = e.clientY + "px";
+    // Tọa độ particles cho hình trái tim (từ công thức toán học)
+    const heartPoints = [
+      [50,63],[50,64],[50,66],[51,70],[53,74],[56,78],[60,80],[64,81],[68,80],[72,78],
+      [76,74],[78,68],[79,62],[79,55],[77,49],[74,43],[70,37],[66,31],[62,26],[58,21],
+      [54,16],[52,12],[50,8],[50,6],[50,4],[49,4],[49,6],[49,8],[47,12],[45,16],
+      [41,21],[37,26],[33,31],[29,37],[25,43],[22,49],[20,55],[20,62],[21,68],[23,74],
+      [27,78],[31,80],[35,81],[39,80],[43,78],[46,74],[48,70],[49,66],[49,64],[50,63]
+    ];
+
+    // Tạo particles ghép thành trái tim
+    const heartContainer = document.getElementById('heartContainer');
+    heartPoints.forEach((point, index) => {
+      const particle = document.createElement('div');
+      particle.className = 'heart-particle';
+      particle.style.left = (point[0] - 2) + 'px';  // Center hạt 4px
+      particle.style.top = (point[1] - 2) + 'px';
+      particle.style.animationDelay = (index * 0.05) + 's';  // Delay nhẹ để stagger
+      heartContainer.appendChild(particle);
+    });
+
+    // Script cho particles bay ra khi hover (từ vị trí ngẫu nhiên trên trái tim)
+    heartContainer.addEventListener("mousemove", (e) => {
+      // Chọn vị trí ngẫu nhiên từ heartPoints
+      const randomPoint = heartPoints[Math.floor(Math.random() * heartPoints.length)];
+      const offsetX = e.clientX - heartContainer.getBoundingClientRect().left + (Math.random() - 0.5) * 20;
+      const offsetY = e.clientY - heartContainer.getBoundingClientRect().top + (Math.random() - 0.5) * 20;
+
+      const flyingParticle = document.createElement("div");
+      flyingParticle.className = "particle";
+      flyingParticle.style.left = (offsetX + randomPoint[0] - 5) + "px";  // Offset từ vị trí trái tim
+      flyingParticle.style.top = (offsetY + randomPoint[1] - 5) + "px";
 
       const colors = ["#ff3a7f", "#ff0a6c", "#ff6b9e", "#ff9ec4"];
-      particles.style.background = colors[Math.floor(Math.random() * colors.length)];
+      flyingParticle.style.background = colors[Math.floor(Math.random() * colors.length)];
 
-      const size = Math.random() * 15 + 5;
-      particles.style.width = size + "px";
-      particles.style.height = size + "px";
+      const size = Math.random() * 10 + 5;
+      flyingParticle.style.width = size + "px";
+      flyingParticle.style.height = size + "px";
 
-      particles.style.setProperty("--random-x", Math.random() * 2 - 1);
-      particles.style.setProperty("--random-y", Math.random() * 2 - 1);
+      flyingParticle.style.setProperty("--random-x", Math.random() * 2 - 1);
+      flyingParticle.style.setProperty("--random-y", Math.random() * 2 - 1);
 
-      document.body.appendChild(particles);
+      document.body.appendChild(flyingParticle);
 
       setTimeout(() => {
-        particles.remove();
+        flyingParticle.remove();
       }, 1500);
     });
   </script>

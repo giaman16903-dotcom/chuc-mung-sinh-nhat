@@ -55,7 +55,7 @@
     .heart-lytuan-container {
       position: relative;
       display: inline-block;
-      width: 600px;  /* Tăng size để thấy đầy đủ trái tim */
+      width: 600px;  /* Giữ size lớn */
       height: 600px;
       margin-top: 20px;
       border-radius: 16px;
@@ -119,14 +119,14 @@
     imgTest.onload = ()=>console.log('Ảnh nền đã load thành công.');
     imgTest.onerror = ()=>console.warn('Không thể load ảnh nền từ "anhcty.jpg". Hãy kiểm tra đường dẫn file trong repo GitHub.');
 
-    // Định nghĩa settings (tối ưu để thấy đầy đủ tim)
+    // Định nghĩa settings (tối ưu để thấy tim đầy đủ ở giữa)
     var settings = {
       particles: {
-        length:   1000, // Tăng số lượng particles nhiều hơn
-        duration:   5, // Tăng thời gian sống để particles ở lâu, thấy hình rõ
-        velocity: 40, // Giảm velocity để chậm hơn, quỹ đạo cong đẹp
-        effect: -0.5, // Điều chỉnh effect nhẹ hơn
-        size:      20, // Tăng size hạt để dễ thấy
+        length:   1500, // Tăng particles để dày đặc
+        duration:   8, // Tăng thời gian sống để thấy hình rõ ràng hơn
+        velocity: 25, // Giảm velocity để particles bay chậm, ở gần tim lâu
+        effect: -0.7, // Điều chỉnh effect cho quỹ đạo cong tự nhiên
+        size:      18, // Kích thước hạt vừa phải
       },
     };
 
@@ -277,7 +277,7 @@
         // helper function to create the path
         function to(t) {
           var point = pointOnHeart(t);
-          point.x = settings.particles.size / 2 + point.x * settings.particles.size / 200;  // Tăng scale cho tim image to hơn
+          point.x = settings.particles.size / 2 + point.x * settings.particles.size / 200;  // Giữ scale lớn cho tim rõ
           point.y = settings.particles.size / 2 - point.y * settings.particles.size / 200;
           return point;
         }
@@ -323,7 +323,9 @@
           var amount = particleRate * deltaTime;
           for (var i = 0; i < amount; i++) {
             var pos = pointOnHeart(Math.PI - 2 * Math.PI * Math.random());
-            // Bỏ scale 0.8, dùng full để fit canvas lớn
+            // Scale pos để tim lớn hơn và ở giữa rõ ràng hơn
+            pos.x *= 1.8;
+            pos.y *= 1.8;
             var dir = pos.clone().length(settings.particles.velocity);
             particles.add(canvas.width / 2 + pos.x, canvas.height / 2 - pos.y, dir.x, -dir.y);
           }

@@ -51,17 +51,17 @@
     .bubbles{position:absolute;inset:0;pointer-events:none;z-index:1}
     .bubble{position:absolute;border-radius:50%;opacity:0.08;background:#fff;filter:blur(10px)}
 
-    /* Style cho container trái tim Lý Tuân (tăng size và điều chỉnh) */
+    /* Style cho container trái tim Lý Tuân */
     .heart-lytuan-container {
       position: relative;
       display: inline-block;
-      width: 600px;  /* Giữ size lớn */
+      width: 600px;
       height: 600px;
       margin-top: 20px;
       border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-      background: rgba(0,0,0,0.3);  /* Nền mờ hơn để blend */
+      background: rgba(0,0,0,0.3);
       z-index: 3;
     }
     .heart-lytuan-canvas {
@@ -122,11 +122,11 @@
     // Định nghĩa settings (tối ưu để thấy tim đầy đủ ở giữa)
     var settings = {
       particles: {
-        length:   1500, // Tăng particles để dày đặc
-        duration:   8, // Tăng thời gian sống để thấy hình rõ ràng hơn
-        velocity: 25, // Giảm velocity để particles bay chậm, ở gần tim lâu
-        effect: -0.7, // Điều chỉnh effect cho quỹ đạo cong tự nhiên
-        size:      18, // Kích thước hạt vừa phải
+        length:   3000, // Tăng particles rất nhiều để dày đặc
+        duration:   12, // Tăng thời gian sống rất lâu để thấy hình rõ ràng
+        velocity: 15, // Giảm velocity thấp để particles bay rất chậm, ở gần tim lâu
+        effect: -0.8, // Điều chỉnh effect cho quỹ đạo cong tự nhiên
+        size:      16, // Kích thước hạt vừa phải
       },
     };
 
@@ -277,8 +277,8 @@
         // helper function to create the path
         function to(t) {
           var point = pointOnHeart(t);
-          point.x = settings.particles.size / 2 + point.x * settings.particles.size / 200;  // Giữ scale lớn cho tim rõ
-          point.y = settings.particles.size / 2 - point.y * settings.particles.size / 200;
+          point.x = settings.particles.size / 2 + point.x * settings.particles.size / 400;  // Giảm scale để tim nhỏ hơn trong hạt
+          point.y = settings.particles.size / 2 - point.y * settings.particles.size / 400;
           return point;
         }
         // create the path
@@ -320,14 +320,14 @@
        
         if (imageLoaded) {
           // create new particles
-          var amount = particleRate * deltaTime;
+          var amount = particleRate * deltaTime * 2;  // Tăng rate gấp đôi để dày đặc hơn
           for (var i = 0; i < amount; i++) {
             var pos = pointOnHeart(Math.PI - 2 * Math.PI * Math.random());
-            // Scale pos để tim lớn hơn và ở giữa rõ ràng hơn
-            pos.x *= 1.8;
-            pos.y *= 1.8;
+            // Scale pos để tim vừa khít ở giữa canvas (dựa trên bounds -160..160 x, -145..145 y)
+            pos.x *= 1.5;  // Scale vừa với 600px (300 radius)
+            pos.y *= 1.5;
             var dir = pos.clone().length(settings.particles.velocity);
-            particles.add(canvas.width / 2 + pos.x, canvas.height / 2 - pos.y, dir.x, -dir.y);
+            particles.add(canvas.width / 2 + pos.x, canvas.height / 2 + pos.y, dir.x, dir.y);  // Sửa -pos.y thành +pos.y để flip đúng
           }
          
           // update and draw particles

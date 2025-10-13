@@ -122,9 +122,9 @@
     // Định nghĩa settings (tối ưu để thấy tim đầy đủ ở giữa)
     var settings = {
       particles: {
-        length:   5000, // Tăng particles rất nhiều để dày đặc
-        duration:   20, // Tăng thời gian sống rất lâu để thấy hình rõ ràng
-        velocity: 10, // Giảm velocity thấp để particles bay rất chậm, ở gần tim lâu
+        length:   3000, // Tăng particles rất nhiều để dày đặc
+        duration:   12, // Tăng thời gian sống rất lâu để thấy hình rõ ràng
+        velocity: 15, // Giảm velocity thấp để particles bay rất chậm, ở gần tim lâu
         effect: -0.8, // Điều chỉnh effect cho quỹ đạo cong tự nhiên
         size:      16, // Kích thước hạt vừa phải
       },
@@ -258,8 +258,7 @@
           particles = new ParticlePool(settings.particles.length),
           particleRate = settings.particles.length / settings.particles.duration,
           time,
-          imageLoaded = false,
-          scale = 1.8;  // Scale để tim vừa khít canvas 600px (dựa trên bounds 320x289)
+          imageLoaded = false;
    
       // get point on heart with -PI <= t <= PI
       function pointOnHeart(t) {
@@ -278,8 +277,8 @@
         // helper function to create the path
         function to(t) {
           var point = pointOnHeart(t);
-          point.x = settings.particles.size / 2 + point.x * settings.particles.size / 400;  // Scale nhỏ cho hạt
-          point.y = settings.particles.size / 2 - point.y * settings.particles.size / 400;  // Flip y cho image
+          point.x = settings.particles.size / 2 + point.x * settings.particles.size / 400;  // Giảm scale để tim nhỏ hơn trong hạt
+          point.y = settings.particles.size / 2 - point.y * settings.particles.size / 400;
           return point;
         }
         // create the path
@@ -321,17 +320,14 @@
        
         if (imageLoaded) {
           // create new particles
-          var amount = particleRate * deltaTime * 5;  // Tăng rate cao để dày đặc
+          var amount = particleRate * deltaTime * 2;  // Tăng rate gấp đôi để dày đặc hơn
           for (var i = 0; i < amount; i++) {
             var pos = pointOnHeart(Math.PI - 2 * Math.PI * Math.random());
-            // Vị trí canvas: center + scaled, flip y
-            var pos_x = canvas.width / 2 + pos.x * scale;
-            var pos_y = canvas.height / 2 - pos.y * scale;
-            // Direction: outward, flip y
+            // Scale pos để tim vừa khít ở giữa canvas (dựa trên bounds -160..160 x, -145..145 y)
+            pos.x *= 1.5;  // Scale vừa với 600px (300 radius)
+            pos.y *= 1.5;
             var dir = pos.clone().length(settings.particles.velocity);
-            var dir_x = dir.x;
-            var dir_y = -dir.y;  // Flip y cho direction
-            particles.add(pos_x, pos_y, dir_x, dir_y);
+            particles.add(canvas.width / 2 + pos.x, canvas.height / 2 + pos.y, dir.x, dir.y);  // Sửa -pos.y thành +pos.y để flip đúng
           }
          
           // update and draw particles

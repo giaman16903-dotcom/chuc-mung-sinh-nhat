@@ -51,24 +51,54 @@
     .bubbles{position:absolute;inset:0;pointer-events:none;z-index:1}
     .bubble{position:absolute;border-radius:50%;opacity:0.08;background:#fff;filter:blur(10px)}
 
-    /* Style cho container trái tim Lý Tuân */
+    /* Style cho container trái tim Lý Tuân (tăng size để thấy đầy đủ) */
     .heart-lytuan-container {
       position: relative;
       display: inline-block;
-      width: 400px;  /* Kích thước canvas nhỏ hơn để fit */
-      height: 400px;
+      width: 500px;  /* Tăng size để thấy đầy đủ trái tim */
+      height: 500px;
       margin-top: 20px;
       border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      background: rgba(0,0,0,0.2);  /* Nền mờ để blend với ảnh nền */
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      background: rgba(0,0,0,0.3);  /* Nền mờ hơn để blend */
       z-index: 3;
+      animation: animate 1.3s infinite;  /* Thêm đập nhẹ */
     }
     .heart-lytuan-canvas {
       position: absolute;
       width: 100%;
       height: 100%;
       border-radius: inherit;
+    }
+    /* CSS cho hình trái tim đập (tùy chọn, để overlay) */
+    .heart-lytuan-container:before,
+    .heart-lytuan-container:after {
+      content: '';
+      position: absolute;
+      background: #FF5CA4;
+      width: 100px;
+      height: 160px;
+      border-top-left-radius: 50px;
+      border-top-right-radius: 50px;
+      z-index: 4;
+    }
+    .heart-lytuan-container:before {
+      left: 100px;
+      transform: rotate(-45deg);
+      transform-origin: 0 100%;
+      box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+    }
+    .heart-lytuan-container:after {
+      left: 0;
+      transform: rotate(45deg);
+      transform-origin: 100% 100%;
+    }
+    @keyframes animate {
+      0% { transform: scale(1); }
+      30% { transform: scale(0.8); }
+      60% { transform: scale(1.2); }
+      100% { transform: scale(1); }
     }
   </style>
 </head>
@@ -119,14 +149,14 @@
     imgTest.onload = ()=>console.log('Ảnh nền đã load thành công.');
     imgTest.onerror = ()=>console.warn('Không thể load ảnh nền từ "anhcty.jpg". Hãy kiểm tra đường dẫn file trong repo GitHub.');
 
-    // Định nghĩa settings, Point, Particle, ParticlePool TRƯỚC khi gọi function
+    // Định nghĩa settings (tăng length và velocity để thấy đầy đủ)
     var settings = {
       particles: {
-        length:   200, // Giảm số lượng để fit canvas nhỏ
-        duration:   2, // particle duration in sec
-        velocity: 50, // Giảm velocity để fit
-        effect: -0.75, // play with this for a nice effect
-        size:      16, // Giảm size để hạt nhỏ hơn
+        length:   500, // Tăng số lượng particles
+        duration:   3, // Tăng thời gian sống để particles ở lâu hơn
+        velocity: 80, // Tăng velocity nhẹ
+        effect: -1.3, // Điều chỉnh effect cho quỹ đạo đẹp hơn
+        size:      12, // Kích thước hạt nhỏ hơn
       },
     };
 
@@ -235,8 +265,8 @@
         }
       };
       ParticlePool.prototype.draw = function(context, image) {
-        var i;  // Sửa: Thêm var i; ở đây để tránh lỗi ReferenceError
-        
+        var i;  // Đảm bảo i được khai báo
+   
         // draw active particles
         if (firstActive < firstFree) {
           for (i = firstActive; i < firstFree; i++)
@@ -252,13 +282,13 @@
       return ParticlePool;
     })();
 
-    // Bây giờ gọi function render trái tim (sau khi định nghĩa đầy đủ)
+    // Bây giờ gọi function render trái tim
     (function(canvas) {
       var context = canvas.getContext('2d'),
           particles = new ParticlePool(settings.particles.length),
-          particleRate = settings.particles.length / settings.particles.duration, // particles/sec
+          particleRate = settings.particles.length / settings.particles.duration,
           time,
-          imageLoaded = false;  // Thêm flag để chờ image load
+          imageLoaded = false;
    
       // get point on heart with -PI <= t <= PI
       function pointOnHeart(t) {
@@ -287,13 +317,13 @@
         var point = to(t);
         context.moveTo(point.x, point.y);
         while (t < Math.PI) {
-          t += 0.01; // baby steps!
+          t += 0.01;
           point = to(t);
           context.lineTo(point.x, point.y);
         }
         context.closePath();
         // create the fill
-        context.fillStyle = '#ea80b0';
+        context.fillStyle = '#FF5CA4';  // Màu hồng đậm hơn
         context.fill();
         // create the image
         var image = new Image();
@@ -301,7 +331,7 @@
         return image;
       })();
    
-      // Chờ image load xong mới render
+      // Chờ image load
       image.onload = function() {
         imageLoaded = true;
         console.log('Image loaded, starting render!');
@@ -309,10 +339,8 @@
    
       // render that thing!
       function render() {
-        // next animation frame
         requestAnimationFrame(render);
        
-        // update time
         var newTime   = new Date().getTime() / 1000,
             deltaTime = newTime - (time || newTime);
         time = newTime;
@@ -320,12 +348,14 @@
         // clear canvas
         context.clearRect(0, 0, canvas.width, canvas.height);
        
-        // Chỉ tạo particles nếu image đã load
         if (imageLoaded) {
           // create new particles
           var amount = particleRate * deltaTime;
           for (var i = 0; i < amount; i++) {
             var pos = pointOnHeart(Math.PI - 2 * Math.PI * Math.random());
+            // Scale pos để fit canvas lớn hơn
+            pos.x *= 0.8;
+            pos.y *= 0.8;
             var dir = pos.clone().length(settings.particles.velocity);
             particles.add(canvas.width / 2 + pos.x, canvas.height / 2 - pos.y, dir.x, -dir.y);
           }
@@ -347,7 +377,7 @@
       setTimeout(function() {
         onResize();
         render();
-      }, 100);  // Tăng delay lên 100ms để chắc chắn
+      }, 100);
     })(document.getElementById('pinkboard'));
   </script>
 </body>

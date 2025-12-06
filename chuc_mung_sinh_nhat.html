@@ -3,7 +3,6 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta http-equiv="Permissions-Policy" content="interest-cohort=()">
   <title>Chúc mừng sinh nhật!</title>
   <style>
     html,body{height:100%;margin:0}
@@ -14,105 +13,98 @@
       justify-content:center;
       text-align:center;
       color:#ffffff;
-      background-image: url("./anhgs.jpg"); /* Đường dẫn tương đối chuẩn GitHub Pages */
+      background-image: url("./anhgs.jpg"); /* đảm bảo ảnh cùng folder index.html */
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
+      background-attachment: fixed;
       position:relative;
+      overflow:hidden;
     }
+
     .overlay{
-      position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,0.35),rgba(0,0,0,0.35));
+      position:absolute;inset:0;
+      background:rgba(0,0,0,0.35);
     }
+
     .card{
       position:relative;z-index:2;
-      max-width:900px;padding:40px;border-radius:16px;
+      width: 90%;max-width:800px;
+      padding:40px;border-radius:16px;
       backdrop-filter: blur(4px);
       box-shadow:0 10px 30px rgba(0,0,0,0.4);
-      width: 90%; max-width: 800px;
     }
+
     h1{
-      margin:0;font-size:clamp(28px,6vw,72px);letter-spacing:1px;
+      margin:0;font-size:clamp(28px,6vw,72px);
       text-shadow:0 4px 18px rgba(0,0,0,0.5);
     }
+
     p{
-      margin-top:12px;margin-bottom:0;font-size:clamp(14px,2.5vw,20px);opacity:0.95;
+      margin-top:12px;margin-bottom:0;
+      font-size:clamp(14px,2.5vw,20px);
+      opacity:0.95;
     }
+
     .video-container {
       margin-top: 20px;
       border-radius: 8px;
       overflow: hidden;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
-    .bubbles{position:absolute;inset:0;pointer-events:none;z-index:1}
-    .bubble{position:absolute;border-radius:50%;opacity:0.08;background:#fff;filter:blur(10px)}
-    .heart-lytuan-container {
-      position: relative;
-      width: 600px;
-      height: 600px;
-      margin-top: 20px;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-      background: rgba(0,0,0,0.6);
-      z-index: 3;
+
+    /* ❄️ hiệu ứng tuyết */
+    .snowflake{
+      position:absolute;
+      top:-10px;
+      color:#fff;
+      font-size:clamp(10px,2vw,20px);
+      user-select:none;
+      pointer-events:none;
+      animation: fall linear infinite;
+      opacity:0.9;
     }
-    .heart-lytuan-canvas {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      border-radius: inherit;
+
+    @keyframes fall {
+      0%   { transform: translateY(0) rotate(0deg); }
+      100% { transform: translateY(110vh) rotate(360deg); }
     }
   </style>
 </head>
 <body>
   <div class="overlay"></div>
+
   <div class="card">
     <h1>Chúc mừng sinh nhật!</h1>
     <p>Chúc bạn Ngân tất cả trừ vất vả 🎉</p>
 
-    <!-- ❗ YouTube embed chuẩn GitHub, không dùng watch?v= -->
     <div class="video-container">
       <iframe width="100%" height="315"
         src="https://www.youtube.com/embed/zEOZQKMW-no"
-        title="Video chúc mừng sinh nhật" frameborder="0"
-        allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen>
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen>
       </iframe>
     </div>
-
-    <div class="heart-lytuan-container">
-      <canvas id="pinkboard" class="heart-lytuan-canvas"></canvas>
-    </div>
   </div>
 
-  <div class="bubbles" aria-hidden="true">
-    <div class="bubble" style="width:220px;height:220px;left:5%;top:10%"></div>
-    <div class="bubble" style="width:140px;height:140px;right:8%;top:20%"></div>
-    <div class="bubble" style="width:90px;height:90px;left:30%;bottom:10%"></div>
-  </div>
-
+  <!-- ❄️ hiệu ứng tuyết rơi -->
   <script>
-    const bubbles = document.querySelectorAll('.bubble');
-    bubbles.forEach((b,i)=>{
-      const dur = 8 + Math.random()*6;
-      b.animate([
-        {transform: 'translateY(0) scale(1)'},
-        {transform: `translateY(${ -20 - Math.random()*40 }px) scale(${1 + Math.random()*0.15})`},
-        {transform: 'translateY(0) scale(1)'}
-      ],{duration: dur*1000, iterations: Infinity, delay: i*300});
-    });
+    function createSnowflake(){
+      const snow = document.createElement("div");
+      snow.classList.add("snowflake");
+      snow.textContent = "❄";
+      snow.style.left = Math.random() * 100 + "vw";
+      snow.style.fontSize = (Math.random() * 10 + 10) + "px";
+      snow.style.animationDuration = (Math.random() * 5 + 5) + "s";
+      snow.style.opacity = Math.random();
+      document.body.appendChild(snow);
 
-    var settings = {
-      particles: {
-        length: 8000,
-        duration: 25,
-        velocity: 15,
-        effect: -0.6,
-        size: 8,
-      },
-    };
+      setTimeout(()=> snow.remove(), 12000);
+    }
 
-    /* ---- SCRIPT TRÁI TIM GIỮ NGUYÊN ---- */
-    ... (giữ nguyên toàn bộ JS trái tim của bạn, không cần chỉnh) ...
+    setInterval(createSnowflake, 200);
   </script>
+
 </body>
 </html>

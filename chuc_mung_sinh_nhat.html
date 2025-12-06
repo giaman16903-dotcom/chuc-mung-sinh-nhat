@@ -14,7 +14,7 @@
       text-align:center;
       color:#ffffff;
       /* đường dẫn ảnh nền -- dùng đường dẫn file tương đối cho GitHub Pages */
-      background-image: url("anhcty.jpg");  /* Thay bằng đường dẫn tương đối nếu deploy */
+      background-image: url("anhgs.jpg");  /* Thay bằng đường dẫn tương đối nếu deploy */
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -115,9 +115,9 @@
 
     // Nếu ảnh không load được, gợi ý thay đổi đường dẫn
     const imgTest = new Image();
-    imgTest.src = 'anhcty.jpg';  // Thay bằng đường dẫn tương đối
+    imgTest.src = 'anhgs.jpg';  // Thay bằng đường dẫn tương đối
     imgTest.onload = ()=>console.log('Ảnh nền đã load thành công.');
-    imgTest.onerror = ()=>console.warn('Không thể load ảnh nền từ "anhcty.jpg". Hãy kiểm tra đường dẫn file trong repo GitHub.');
+    imgTest.onerror = ()=>console.warn('Không thể load ảnh nền từ "anhgs.jpg". Hãy kiểm tra đường dẫn file trong repo GitHub.');
 
     // Định nghĩa settings (tối ưu để thấy tim đầy đủ ở giữa)
     var settings = {

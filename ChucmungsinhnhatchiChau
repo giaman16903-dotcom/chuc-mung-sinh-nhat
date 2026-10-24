@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Chúc mừng sinh nhật!</title>
+  <style>
+    html,body{height:100%;margin:0}
+    body{
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      color:#ffffff;
+      background-image: url("./anhgcc.jpeg"); /* đảm bảo ảnh cùng folder index.html */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .overlay{
+      position:absolute;inset:0;
+      background:rgba(0,0,0,0.35);
+    }
+
+    .card{
+      position:relative;z-index:2;
+      width: 90%;max-width:800px;
+      padding:40px;border-radius:16px;
+      backdrop-filter: blur(4px);
+      box-shadow:0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    h1{
+      margin:0;font-size:clamp(28px,6vw,72px);
+      text-shadow:0 4px 18px rgba(0,0,0,0.5);
+    }
+
+    p{
+      margin-top:12px;margin-bottom:0;
+      font-size:clamp(14px,2.5vw,20px);
+      opacity:0.95;
+    }
+
+    .video-container {
+      margin-top: 20px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    /* ❄️ hiệu ứng tuyết */
+    .snowflake{
+      position:absolute;
+      top:-10px;
+      color:#fff;
+      font-size:clamp(10px,2vw,20px);
+      user-select:none;
+      pointer-events:none;
+      animation: fall linear infinite;
+      opacity:0.9;
+    }
+
+    @keyframes fall {
+      0%   { transform: translateY(0) rotate(0deg); }
+      100% { transform: translateY(110vh) rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+
+  <div class="card">
+    <h1>Chúc mừng sinh nhật!</h1>
+    <p>Chúc chị Châu tất cả trừ vất vả 🎉</p>
+
+    <div class="video-container">
+      <iframe width="100%" height="315"
+        src="https://www.youtube.com/embed/vo4FIzhVNwM"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+
+  <!-- ❄️ hiệu ứng tuyết rơi -->
+  <script>
+    function createSnowflake(){
+      const snow = document.createElement("div");
+      snow.classList.add("snowflake");
+      snow.textContent = "❄";
+      snow.style.left = Math.random() * 100 + "vw";
+      snow.style.fontSize = (Math.random() * 10 + 10) + "px";
+      snow.style.animationDuration = (Math.random() * 5 + 5) + "s";
+      snow.style.opacity = Math.random();
+      document.body.appendChild(snow);
+
+      setTimeout(()=> snow.remove(), 12000);
+    }
+
+    setInterval(createSnowflake, 200);
+  </script>
+
+</body>
+</html>
